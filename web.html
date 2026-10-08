@@ -1,0 +1,2296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>QuickCart - Instant Grocery Delivery</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f5f6f8;
+    color:#222;
+    transition:.3s;
+}
+
+body.dark{
+    background:#121212;
+    color:#eee;
+}
+
+header{
+    background:#fff;
+    padding:15px 5%;
+    display:flex;
+    align-items:center;
+    gap:25px;
+    position:sticky;
+    top:0;
+    z-index:100;
+    box-shadow:0 2px 10px #0001;
+}
+
+.dark header,
+.dark .card,
+.dark .product,
+.dark .modal-box,
+.dark .category{
+    background:#1e1e1e;
+    color:#eee;
+}
+
+.logo{
+    color:#16a34a;
+    font-size:25px;
+    font-weight:bold;
+    white-space:nowrap;
+}
+
+.location{
+    cursor:pointer;
+    font-size:14px;
+}
+
+.search{
+    flex:1;
+    position:relative;
+}
+
+.search input{
+    width:100%;
+    padding:13px 45px 13px 15px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    outline:none;
+}
+
+.search span{
+    position:absolute;
+    right:15px;
+    top:12px;
+}
+
+.nav{
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+
+.nav button{
+    border:0;
+    background:transparent;
+    cursor:pointer;
+    font-size:15px;
+}
+
+.cart-btn{
+    background:#16a34a!important;
+    color:white;
+    padding:11px 15px;
+    border-radius:7px;
+}
+
+.hero{
+    background:linear-gradient(120deg,#dcfce7,#f0fdf4);
+    padding:40px 5%;
+}
+
+.hero h1{
+    font-size:38px;
+    margin-bottom:10px;
+}
+
+.hero p{
+    color:#555;
+}
+
+.container{
+    width:90%;
+    max-width:1250px;
+    margin:auto;
+}
+
+.section{
+    padding:30px 0;
+}
+
+.categories{
+    display:flex;
+    gap:15px;
+    overflow-x:auto;
+    padding-bottom:10px;
+}
+
+.category{
+    min-width:110px;
+    background:#fff;
+    padding:15px;
+    text-align:center;
+    border-radius:10px;
+    cursor:pointer;
+    box-shadow:0 2px 10px #0001;
+}
+
+.category:hover{
+    transform:translateY(-3px);
+}
+
+.category-icon{
+    font-size:32px;
+    margin-bottom:8px;
+}
+
+.product-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
+    gap:18px;
+}
+
+.product{
+    background:#fff;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 3px 12px #0001;
+    position:relative;
+    transition:.2s;
+}
+
+.product:hover{
+    transform:translateY(-3px);
+}
+
+.product img{
+    width:100%;
+    height:170px;
+    object-fit:cover;
+}
+
+.product-body{
+    padding:14px;
+}
+
+.product h3{
+    font-size:16px;
+    margin-bottom:6px;
+}
+
+.unit{
+    color:#777;
+    font-size:13px;
+}
+
+.rating{
+    color:#f59e0b;
+    margin:7px 0;
+}
+
+.price{
+    font-size:19px;
+    font-weight:bold;
+}
+
+.old-price{
+    color:#888;
+    text-decoration:line-through;
+    font-size:13px;
+    margin-left:5px;
+}
+
+.discount{
+    position:absolute;
+    top:10px;
+    left:10px;
+    background:#16a34a;
+    color:#fff;
+    padding:5px 8px;
+    border-radius:5px;
+    font-size:12px;
+}
+
+.wish{
+    position:absolute;
+    right:10px;
+    top:10px;
+    background:white;
+    border:0;
+    border-radius:50%;
+    width:35px;
+    height:35px;
+    cursor:pointer;
+    font-size:19px;
+}
+
+.add-btn{
+    width:100%;
+    margin-top:10px;
+    padding:10px;
+    border:1px solid #16a34a;
+    background:#fff;
+    color:#16a34a;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.add-btn:hover{
+    background:#16a34a;
+    color:#fff;
+}
+
+.dark .add-btn{
+    background:#1e1e1e;
+}
+
+.card{
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+    margin-bottom:15px;
+    box-shadow:0 3px 12px #0001;
+}
+
+.btn{
+    border:0;
+    background:#16a34a;
+    color:white;
+    padding:11px 17px;
+    border-radius:7px;
+    cursor:pointer;
+}
+
+.btn.red{
+    background:#dc2626;
+}
+
+.btn.gray{
+    background:#6b7280;
+}
+
+.hidden{
+    display:none!important;
+}
+
+.modal{
+    position:fixed;
+    inset:0;
+    background:#0009;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:500;
+    padding:20px;
+}
+
+.modal-box{
+    width:100%;
+    max-width:520px;
+    max-height:90vh;
+    overflow:auto;
+    background:white;
+    padding:25px;
+    border-radius:12px;
+}
+
+.close{
+    float:right;
+    font-size:25px;
+    cursor:pointer;
+}
+
+.modal input,
+.modal select{
+    width:100%;
+    padding:12px;
+    margin:7px 0 14px;
+    border:1px solid #ccc;
+    border-radius:6px;
+}
+
+.cart-item{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    border-bottom:1px solid #ddd;
+    padding:12px 0;
+}
+
+.cart-item img{
+    width:65px;
+    height:65px;
+    object-fit:cover;
+    border-radius:7px;
+}
+
+.qty button{
+    border:0;
+    width:28px;
+    height:28px;
+    cursor:pointer;
+}
+
+.banner{
+    background:#111827;
+    color:#fff;
+    padding:20px;
+    border-radius:10px;
+    margin-bottom:25px;
+}
+
+.order-status{
+    display:flex;
+    justify-content:space-between;
+    margin:20px 0;
+}
+
+.step{
+    text-align:center;
+    flex:1;
+}
+
+.step-circle{
+    width:35px;
+    height:35px;
+    border-radius:50%;
+    background:#ddd;
+    margin:auto auto 7px;
+    padding-top:9px;
+}
+
+.step.active .step-circle{
+    background:#16a34a;
+    color:#fff;
+}
+
+.dashboard{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:15px;
+}
+
+.stat{
+    background:linear-gradient(135deg,#16a34a,#15803d);
+    color:#fff;
+    padding:25px;
+    border-radius:10px;
+}
+
+.stat h2{
+    font-size:30px;
+}
+
+footer{
+    background:#111827;
+    color:#fff;
+    padding:30px;
+    text-align:center;
+    margin-top:40px;
+}
+
+.toast{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    background:#111827;
+    color:#fff;
+    padding:14px 20px;
+    border-radius:8px;
+    display:none;
+    z-index:1000;
+}
+
+@media(max-width:850px){
+
+    header{
+        flex-wrap:wrap;
+    }
+
+    .search{
+        order:3;
+        flex-basis:100%;
+    }
+
+    .nav button:not(.cart-btn){
+        font-size:12px;
+    }
+
+    .hero h1{
+        font-size:30px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">🛒 QuickCart</div>
+
+<div class="location" onclick="changeAddress()">
+📍 <b id="locationText">Select Location</b>
+</div>
+
+<div class="search">
+<input id="searchInput"
+placeholder="Search for groceries, fruits, snacks..."
+oninput="searchProducts()">
+<span>🔎</span>
+</div>
+
+<div class="nav">
+
+<button onclick="showPage('home')">Home</button>
+
+<button onclick="showPage('orders')">Orders</button>
+
+<button onclick="showPage('wishlist')">❤️</button>
+
+<button onclick="showPage('profile')">👤</button>
+
+<button onclick="toggleDark()">🌙</button>
+
+<button class="cart-btn"
+onclick="openCart()">
+🛒 Cart (<span id="cartCount">0</span>)
+</button>
+
+<button id="authBtn"
+onclick="openLogin()">
+Login
+</button>
+
+</div>
+
+</header>
+
+
+<!-- HOME -->
+
+<section id="homePage">
+
+<div class="hero">
+
+<div class="container">
+
+<h1>Groceries delivered in minutes ⚡</h1>
+
+<p>Fresh groceries, snacks, beverages and daily essentials at your doorstep.</p>
+
+</div>
+
+</div>
+
+
+<div class="container section">
+
+<div class="banner">
+
+<h2>🔥 Super Saver Deals</h2>
+
+<p>Get discounts on your everyday essentials.</p>
+
+<br>
+
+<button class="btn"
+onclick="applyCoupon('SAVE20')">
+Use SAVE20
+</button>
+
+</div>
+
+
+<h2>Shop by Category</h2>
+
+<br>
+
+<div class="categories">
+
+<div class="category"
+onclick="filterCategory('Fruits & Vegetables')">
+
+<div class="category-icon">🥦</div>
+
+<p>Fruits & Vegetables</p>
+
+</div>
+
+<div class="category"
+onclick="filterCategory('Dairy & Breakfast')">
+
+<div class="category-icon">🥛</div>
+
+<p>Dairy & Breakfast</p>
+
+</div>
+
+<div class="category"
+onclick="filterCategory('Snacks')">
+
+<div class="category-icon">🍪</div>
+
+<p>Snacks</p>
+
+</div>
+
+<div class="category"
+onclick="filterCategory('Beverages')">
+
+<div class="category-icon">🥤</div>
+
+<p>Beverages</p>
+
+</div>
+
+<div class="category"
+onclick="filterCategory('Staples')">
+
+<div class="category-icon">🍚</div>
+
+<p>Staples</p>
+
+</div>
+
+<div class="category"
+onclick="filterCategory('Personal Care')">
+
+<div class="category-icon">🧴</div>
+
+<p>Personal Care</p>
+
+</div>
+
+<div class="category"
+onclick="filterCategory('Home Care')">
+
+<div class="category-icon">🧹</div>
+
+<p>Home Care</p>
+
+</div>
+
+<div class="category"
+onclick="filterCategory('Pet Care')">
+
+<div class="category-icon">🐶</div>
+
+<p>Pet Care</p>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="container section">
+
+<h2>🔥 Trending Products</h2>
+
+<br>
+
+<div class="product-grid"
+id="productGrid"></div>
+
+</div>
+
+</section>
+
+
+<!-- ORDERS -->
+
+<section id="ordersPage"
+class="hidden">
+
+<div class="container section">
+
+<h2>📦 My Orders</h2>
+
+<br>
+
+<div id="ordersContainer"></div>
+
+</div>
+
+</section>
+
+
+<!-- WISHLIST -->
+
+<section id="wishlistPage"
+class="hidden">
+
+<div class="container section">
+
+<h2>❤️ My Wishlist</h2>
+
+<br>
+
+<div class="product-grid"
+id="wishlistGrid"></div>
+
+</div>
+
+</section>
+
+
+<!-- PROFILE -->
+
+<section id="profilePage"
+class="hidden">
+
+<div class="container section">
+
+<h2>👤 My Profile</h2>
+
+<br>
+
+<div class="card">
+
+<h3 id="profileName">Guest</h3>
+
+<p id="profileEmail"></p>
+
+<br>
+
+<button class="btn"
+onclick="logout()">
+Logout
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ADMIN -->
+
+<section id="adminPage"
+class="hidden">
+
+<div class="container section">
+
+<h2>📊 Admin Dashboard</h2>
+
+<br>
+
+<div class="dashboard">
+
+<div class="stat">
+<p>Products</p>
+<h2 id="statProducts">0</h2>
+</div>
+
+<div class="stat">
+<p>Users</p>
+<h2 id="statUsers">0</h2>
+</div>
+
+<div class="stat">
+<p>Orders</p>
+<h2 id="statOrders">0</h2>
+</div>
+
+<div class="stat">
+<p>Revenue</p>
+<h2>₹<span id="statRevenue">0</span></h2>
+</div>
+
+</div>
+
+<br>
+
+<h2>Recent Orders</h2>
+
+<div id="adminOrders"></div>
+
+</div>
+
+</section>
+
+
+<!-- LOGIN -->
+
+<div class="modal"
+id="loginModal">
+
+<div class="modal-box">
+
+<span class="close"
+onclick="closeModal('loginModal')">×</span>
+
+<h2>🔐 Login</h2>
+
+<br>
+
+<input id="loginEmail"
+type="email"
+placeholder="Email">
+
+<input id="loginPassword"
+type="password"
+placeholder="Password">
+
+<button class="btn"
+onclick="login()">
+Login
+</button>
+
+<br><br>
+
+<p>
+New customer?
+<button class="btn"
+onclick="switchSignup()">
+Create Account
+</button>
+</p>
+
+</div>
+
+</div>
+
+
+<!-- SIGNUP -->
+
+<div class="modal"
+id="signupModal">
+
+<div class="modal-box">
+
+<span class="close"
+onclick="closeModal('signupModal')">×</span>
+
+<h2>📝 Create Account</h2>
+
+<br>
+
+<input id="signupName"
+placeholder="Full Name">
+
+<input id="signupEmail"
+type="email"
+placeholder="Email">
+
+<input id="signupPassword"
+type="password"
+placeholder="Password">
+
+<button class="btn"
+onclick="signup()">
+Sign Up
+</button>
+
+</div>
+
+</div>
+
+
+<!-- CART -->
+
+<div class="modal"
+id="cartModal">
+
+<div class="modal-box">
+
+<span class="close"
+onclick="closeModal('cartModal')">×</span>
+
+<h2>🛒 Your Cart</h2>
+
+<br>
+
+<div id="cartItems"></div>
+
+<hr>
+
+<br>
+
+<p>Subtotal:
+<b>₹<span id="subtotal">0</span></b>
+</p>
+
+<p>Delivery:
+<b>₹<span id="deliveryFee">0</span></b>
+</p>
+
+<p>Discount:
+<b>₹<span id="discount">0</span></b>
+</p>
+
+<h2>
+Total: ₹<span id="cartTotal">0</span>
+</h2>
+
+<br>
+
+<input id="couponInput"
+placeholder="Coupon code">
+
+<button class="btn"
+onclick="useCoupon()">
+Apply Coupon
+</button>
+
+<br><br>
+
+<button class="btn"
+onclick="checkout()">
+Proceed to Checkout
+</button>
+
+</div>
+
+</div>
+
+
+<!-- CHECKOUT -->
+
+<div class="modal"
+id="checkoutModal">
+
+<div class="modal-box">
+
+<span class="close"
+onclick="closeModal('checkoutModal')">×</span>
+
+<h2>🚚 Checkout</h2>
+
+<br>
+
+<label>Delivery Address</label>
+
+<input id="addressInput"
+placeholder="Enter your delivery address">
+
+<label>Payment Method</label>
+
+<select id="paymentMethod">
+
+<option>Cash on Delivery</option>
+
+<option>UPI</option>
+
+<option>Credit / Debit Card</option>
+
+<option>Wallet</option>
+
+</select>
+
+<br>
+
+<p>
+Delivery in approximately
+<b>10-20 minutes</b> ⚡
+</p>
+
+<br>
+
+<button class="btn"
+onclick="placeOrder()">
+💳 Place Order
+</button>
+
+</div>
+
+</div>
+
+
+<!-- TRACKING -->
+
+<div class="modal"
+id="trackingModal">
+
+<div class="modal-box">
+
+<span class="close"
+onclick="closeModal('trackingModal')">×</span>
+
+<h2>🚚 Order Tracking</h2>
+
+<br>
+
+<div class="order-status">
+
+<div class="step active">
+<div class="step-circle">✓</div>
+<p>Placed</p>
+</div>
+
+<div class="step active">
+<div class="step-circle">✓</div>
+<p>Packed</p>
+</div>
+
+<div class="step active">
+<div class="step-circle">✓</div>
+<p>On Way</p>
+</div>
+
+<div class="step">
+<div class="step-circle">4</div>
+<p>Delivered</p>
+</div>
+
+</div>
+
+<h3>Delivery Partner</h3>
+
+<p>Rahul 🚴</p>
+
+<br>
+
+<p>Estimated delivery:</p>
+
+<h3>10-15 minutes</h3>
+
+</div>
+
+</div>
+
+
+<div class="toast"
+id="toast"></div>
+
+
+<footer>
+
+<h3>🛒 QuickCart</h3>
+
+<br>
+
+<p>Fast grocery delivery website project</p>
+
+<p>© 2026 QuickCart</p>
+
+</footer>
+
+
+<script>
+
+/* =========================
+   PRODUCTS
+========================= */
+
+const products=[
+
+{
+id:1,
+name:"Fresh Bananas",
+category:"Fruits & Vegetables",
+price:49,
+old:65,
+unit:"1 kg",
+rating:4.7,
+discount:25,
+image:"https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=700&q=80"
+},
+
+{
+id:2,
+name:"Fresh Apples",
+category:"Fruits & Vegetables",
+price:149,
+old:180,
+unit:"1 kg",
+rating:4.8,
+discount:17,
+image:"https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=700&q=80"
+},
+
+{
+id:3,
+name:"Tomatoes",
+category:"Fruits & Vegetables",
+price:39,
+old:55,
+unit:"1 kg",
+rating:4.5,
+discount:29,
+image:"https://images.unsplash.com/photo-1546094096-0df4bcaaa337?auto=format&fit=crop&w=700&q=80"
+},
+
+{
+id:4,
+name:"Milk",
+category:"Dairy & Breakfast",
+price:62,
+old:68,
+unit:"1 litre",
+rating:4.8,
+discount:9,
+image:"https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=700&q=80"
+},
+
+{
+id:5,
+name:"Brown Bread",
+category:"Dairy & Breakfast",
+price:45,
+old:55,
+unit:"400 g",
+rating:4.4,
+discount:18,
+image:"https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=700&q=80"
+},
+
+{
+id:6,
+name:"Corn Flakes",
+category:"Dairy & Breakfast",
+price:199,
+old:240,
+unit:"500 g",
+rating:4.6,
+discount:17,
+image:"https://images.unsplash.com/photo-1517093728432-a0440f8d45af?auto=format&fit=crop&w=700&q=80"
+},
+
+{
+id:7,
+name:"Potato Chips",
+category:"Snacks",
+price:40,
+old:50,
+unit:"100 g",
+rating:4.5,
+discount:20,
+image:"https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=700&q=80"
+},
+
+{
+id:8,
+name:"Chocolate Cookies",
+category:"Snacks",
+price:80,
+old:100,
+unit:"200 g",
+rating:4.7,
+discount:20,
+image:"https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=700&q=80"
+},
+
+{
+id:9,
+name:"Cola",
+category:"Beverages",
+price:45,
+old:50,
+unit:"750 ml",
+rating:4.3,
+discount:10,
+image:"https://images.unsplash.com/photo-1629203851122-3726ecdf080e?auto=format&fit=crop&w=700&q=80"
+},
+
+{
+id:10,
+name:"Orange Juice",
+category:"Beverages",
+price:120,
+old:145,
+unit:"1 litre",
+rating:4.6,
+discount:17,
+image:"https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=700&q=80"
+},
+
+{
+id:11,
+name:"Basmati Rice",
+category:"Staples",
+price:299,
+old:350,
+unit:"5 kg",
+rating:4.8,
+discount:15,
+image:"https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=700&q=80"
+},
+
+{
+id:12,
+name:"Wheat Flour",
+category:"Staples",
+price:210,
+old:250,
+unit:"5 kg",
+rating:4.6,
+discount:16,
+image:"https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=700&q=80"
+},
+
+{
+id:13,
+name:"Shampoo",
+category:"Personal Care",
+price:249,
+old:299,
+unit:"650 ml",
+rating:4.5,
+discount:17,
+image:"https://images.unsplash.com/photo-1556229010-6c3f2c9ca5f8?auto=format&fit=crop&w=700&q=80"
+},
+
+{
+id:14,
+name:"Face Wash",
+category:"Personal Care",
+price:179,
+old:220,
+unit:"100 ml",
+rating:4.4,
+discount:19,
+image:"https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&w=700&q=80"
+},
+
+{
+id:15,
+name:"Dish Wash Liquid",
+category:"Home Care",
+price:149,
+old:180,
+unit:"500 ml",
+rating:4.6,
+discount:17,
+image:"https://images.unsplash.com/photo-1585832770485-e68a5dbfad52?auto=format&fit=crop&w=700&q=80"
+},
+
+{
+id:16,
+name:"Laundry Detergent",
+category:"Home Care",
+price:299,
+old:350,
+unit:"2 kg",
+rating:4.7,
+discount:15,
+image:"https://images.unsplash.com/photo-1582735689369-4fe89db7114c?auto=format&fit=crop&w=700&q=80"
+},
+
+{
+id:17,
+name:"Dog Food",
+category:"Pet Care",
+price:499,
+old:550,
+unit:"2 kg",
+rating:4.8,
+discount:9,
+image:"https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&w=700&q=80"
+},
+
+{
+id:18,
+name:"Cat Food",
+category:"Pet Care",
+price:399,
+old:450,
+unit:"1 kg",
+rating:4.7,
+discount:11,
+image:"https://images.unsplash.com/photo-1519052537078-e6302a4968d4?auto=format&fit=crop&w=700&q=80"
+}
+
+];
+
+
+/* =========================
+   STORAGE
+========================= */
+
+let users=
+JSON.parse(localStorage.getItem("qcUsers"))||[];
+
+let currentUser=
+JSON.parse(localStorage.getItem("qcCurrentUser"))||null;
+
+let cart=
+JSON.parse(localStorage.getItem("qcCart"))||[];
+
+let wishlist=
+JSON.parse(localStorage.getItem("qcWishlist"))||[];
+
+let orders=
+JSON.parse(localStorage.getItem("qcOrders"))||[];
+
+let coupon="";
+
+
+/* =========================
+   RENDER PRODUCTS
+========================= */
+
+function renderProducts(list){
+
+let grid=document.getElementById("productGrid");
+
+grid.innerHTML="";
+
+if(list.length===0){
+
+grid.innerHTML=
+`<div class="card">
+<h3>No products found.</h3>
+</div>`;
+
+return;
+
+}
+
+list.forEach(p=>{
+
+let liked=wishlist.includes(p.id)?"❤️":"♡";
+
+grid.innerHTML+=`
+
+<div class="product">
+
+<div class="discount">
+${p.discount}% OFF
+</div>
+
+<button class="wish"
+onclick="toggleWishlist(${p.id})">
+${liked}
+</button>
+
+<img src="${p.image}">
+
+<div class="product-body">
+
+<h3>${p.name}</h3>
+
+<p class="unit">${p.unit}</p>
+
+<p class="rating">
+⭐ ${p.rating}
+</p>
+
+<p class="price">
+₹${p.price}
+
+<span class="old-price">
+₹${p.old}
+</span>
+</p>
+
+<button class="add-btn"
+onclick="addToCart(${p.id})">
+ADD
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+/* =========================
+   CATEGORY FILTER
+========================= */
+
+function filterCategory(category){
+
+renderProducts(
+products.filter(p=>p.category===category)
+);
+
+document.getElementById("searchInput").value="";
+
+window.scrollTo({
+top:500,
+behavior:"smooth"
+});
+
+}
+
+
+function searchProducts(){
+
+let q=
+document.getElementById("searchInput")
+.value
+.toLowerCase();
+
+let result=products.filter(p=>
+p.name.toLowerCase().includes(q)||
+p.category.toLowerCase().includes(q)
+);
+
+renderProducts(result);
+
+}
+
+
+/* =========================
+   CART
+========================= */
+
+function addToCart(id){
+
+let item=cart.find(x=>x.id===id);
+
+if(item){
+
+item.quantity++;
+
+}else{
+
+let p=products.find(x=>x.id===id);
+
+cart.push({
+...p,
+quantity:1
+});
+
+}
+
+saveCart();
+
+updateCartCount();
+
+showToast("Added to cart 🛒");
+
+}
+
+
+function saveCart(){
+
+localStorage.setItem(
+"qcCart",
+JSON.stringify(cart)
+);
+
+}
+
+
+function updateCartCount(){
+
+let count=cart.reduce(
+(sum,item)=>sum+item.quantity,
+0
+);
+
+document.getElementById("cartCount")
+.innerText=count;
+
+}
+
+
+function openCart(){
+
+renderCart();
+
+document.getElementById("cartModal")
+.style.display="flex";
+
+}
+
+
+function renderCart(){
+
+let container=
+document.getElementById("cartItems");
+
+container.innerHTML="";
+
+let subtotal=0;
+
+cart.forEach(item=>{
+
+let total=item.price*item.quantity;
+
+subtotal+=total;
+
+container.innerHTML+=`
+
+<div class="cart-item">
+
+<img src="${item.image}">
+
+<div style="flex:1">
+
+<h3>${item.name}</h3>
+
+<p>₹${item.price}</p>
+
+<div class="qty">
+
+<button onclick="changeQty(${item.id},-1)">
+−
+</button>
+
+${item.quantity}
+
+<button onclick="changeQty(${item.id},1)">
++
+</button>
+
+</div>
+
+</div>
+
+<strong>₹${total}</strong>
+
+</div>
+
+`;
+
+});
+
+let delivery=subtotal===0?0:30;
+
+let discount=0;
+
+if(coupon==="SAVE20")
+discount=Math.round(subtotal*.20);
+
+if(coupon==="NEWUSER")
+discount=Math.min(100,Math.round(subtotal*.15));
+
+let total=
+subtotal+delivery-discount;
+
+document.getElementById("subtotal")
+.innerText=subtotal;
+
+document.getElementById("deliveryFee")
+.innerText=delivery;
+
+document.getElementById("discount")
+.innerText=discount;
+
+document.getElementById("cartTotal")
+.innerText=Math.max(0,total);
+
+}
+
+
+function changeQty(id,change){
+
+let item=cart.find(x=>x.id===id);
+
+if(!item)return;
+
+item.quantity+=change;
+
+if(item.quantity<=0){
+
+cart=cart.filter(x=>x.id!==id);
+
+}
+
+saveCart();
+
+updateCartCount();
+
+renderCart();
+
+}
+
+
+/* =========================
+   COUPONS
+========================= */
+
+function applyCoupon(code){
+
+coupon=code;
+
+showToast("Coupon "+code+" applied!");
+
+openCart();
+
+}
+
+
+function useCoupon(){
+
+let code=
+document.getElementById("couponInput")
+.value
+.toUpperCase()
+.trim();
+
+if(
+code!=="SAVE20" &&
+code!=="NEWUSER"
+){
+
+alert("Invalid coupon.");
+
+return;
+
+}
+
+coupon=code;
+
+renderCart();
+
+showToast("Coupon applied 🎉");
+
+}
+
+
+/* =========================
+   CHECKOUT
+========================= */
+
+function checkout(){
+
+if(cart.length===0){
+
+alert("Your cart is empty.");
+
+return;
+
+}
+
+if(!currentUser){
+
+alert("Please login before checkout.");
+
+openLogin();
+
+return;
+
+}
+
+document.getElementById("checkoutModal")
+.style.display="flex";
+
+}
+
+
+function placeOrder(){
+
+let address=
+document.getElementById("addressInput")
+.value.trim();
+
+let payment=
+document.getElementById("paymentMethod")
+.value;
+
+if(!address){
+
+alert("Please enter delivery address.");
+
+return;
+
+}
+
+let subtotal=cart.reduce(
+(sum,item)=>sum+(item.price*item.quantity),
+0
+);
+
+let delivery=30;
+
+let discount=0;
+
+if(coupon==="SAVE20")
+discount=Math.round(subtotal*.20);
+
+if(coupon==="NEWUSER")
+discount=Math.min(100,Math.round(subtotal*.15));
+
+let total=
+subtotal+delivery-discount;
+
+let order={
+
+id:"QC"+Date.now(),
+
+user:currentUser.email,
+
+items:cart,
+
+address:address,
+
+payment:payment,
+
+subtotal:subtotal,
+
+discount:discount,
+
+delivery:delivery,
+
+total:Math.max(0,total),
+
+status:"Placed",
+
+date:new Date().toLocaleString()
+
+};
+
+orders.push(order);
+
+localStorage.setItem(
+"qcOrders",
+JSON.stringify(orders)
+);
+
+cart=[];
+
+coupon="";
+
+saveCart();
+
+updateCartCount();
+
+closeModal("checkoutModal");
+
+closeModal("cartModal");
+
+showToast("🎉 Order placed successfully!");
+
+showPage("orders");
+
+renderOrders();
+
+updateAdmin();
+
+}
+
+
+/* =========================
+   ORDERS
+========================= */
+
+function renderOrders(){
+
+let container=
+document.getElementById("ordersContainer");
+
+container.innerHTML="";
+
+if(!currentUser){
+
+container.innerHTML=
+`<div class="card">
+<h3>Please login to see your orders.</h3>
+</div>`;
+
+return;
+
+}
+
+let mine=
+orders.filter(
+o=>o.user===currentUser.email
+);
+
+if(mine.length===0){
+
+container.innerHTML=
+`<div class="card">
+<h3>No orders yet.</h3>
+<p>Start shopping now!</p>
+</div>`;
+
+return;
+
+}
+
+mine.slice().reverse().forEach(order=>{
+
+let items=order.items.map(
+i=>`${i.name} × ${i.quantity}`
+).join(", ");
+
+container.innerHTML+=`
+
+<div class="card">
+
+<h3>📦 Order ${order.id}</h3>
+
+<p>${items}</p>
+
+<br>
+
+<p>📅 ${order.date}</p>
+
+<p>📍 ${order.address}</p>
+
+<p>💳 ${order.payment}</p>
+
+<p>
+Status:
+<b>${order.status}</b>
+</p>
+
+<h3>₹${order.total}</h3>
+
+<br>
+
+<button class="btn"
+onclick="trackOrder('${order.id}')">
+🚚 Track Order
+</button>
+
+<button class="btn red"
+onclick="cancelOrder('${order.id}')">
+Cancel
+</button>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+function trackOrder(id){
+
+let order=orders.find(x=>x.id===id);
+
+if(!order)return;
+
+document.getElementById("trackingModal")
+.style.display="flex";
+
+}
+
+
+function cancelOrder(id){
+
+if(!confirm("Cancel this order?"))
+return;
+
+let order=orders.find(x=>x.id===id);
+
+if(order)
+order.status="Cancelled";
+
+localStorage.setItem(
+"qcOrders",
+JSON.stringify(orders)
+);
+
+renderOrders();
+
+updateAdmin();
+
+showToast("Order cancelled.");
+
+}
+
+
+/* =========================
+   WISHLIST
+========================= */
+
+function toggleWishlist(id){
+
+if(wishlist.includes(id)){
+
+wishlist=wishlist.filter(x=>x!==id);
+
+}else{
+
+wishlist.push(id);
+
+}
+
+localStorage.setItem(
+"qcWishlist",
+JSON.stringify(wishlist)
+);
+
+renderProducts(products);
+
+renderWishlist();
+
+}
+
+
+function renderWishlist(){
+
+let grid=
+document.getElementById("wishlistGrid");
+
+grid.innerHTML="";
+
+let list=
+products.filter(p=>wishlist.includes(p.id));
+
+if(list.length===0){
+
+grid.innerHTML=
+`<div class="card">
+<h3>Your wishlist is empty.</h3>
+</div>`;
+
+return;
+
+}
+
+list.forEach(p=>{
+
+grid.innerHTML+=`
+
+<div class="product">
+
+<img src="${p.image}">
+
+<div class="product-body">
+
+<h3>${p.name}</h3>
+
+<p>${p.unit}</p>
+
+<p class="rating">
+⭐ ${p.rating}
+</p>
+
+<p class="price">
+₹${p.price}
+</p>
+
+<button class="add-btn"
+onclick="addToCart(${p.id})">
+ADD TO CART
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+/* =========================
+   LOGIN
+========================= */
+
+function openLogin(){
+
+document.getElementById("loginModal")
+.style.display="flex";
+
+}
+
+
+function login(){
+
+let email=
+document.getElementById("loginEmail")
+.value.trim();
+
+let password=
+document.getElementById("loginPassword")
+.value;
+
+let user=
+users.find(
+u=>u.email===email &&
+u.password===password
+);
+
+if(!user){
+
+alert("Invalid email or password.");
+
+return;
+
+}
+
+currentUser=user;
+
+localStorage.setItem(
+"qcCurrentUser",
+JSON.stringify(user)
+);
+
+closeModal("loginModal");
+
+updateAuth();
+
+updateProfile();
+
+showToast("Welcome "+user.name+" 👋");
+
+}
+
+
+function signup(){
+
+let name=
+document.getElementById("signupName")
+.value.trim();
+
+let email=
+document.getElementById("signupEmail")
+.value.trim();
+
+let password=
+document.getElementById("signupPassword")
+.value;
+
+if(!name||!email||!password){
+
+alert("Fill all fields.");
+
+return;
+
+}
+
+if(users.some(u=>u.email===email)){
+
+alert("Account already exists.");
+
+return;
+
+}
+
+let user={
+name,
+email,
+password
+};
+
+users.push(user);
+
+localStorage.setItem(
+"qcUsers",
+JSON.stringify(users)
+);
+
+currentUser=user;
+
+localStorage.setItem(
+"qcCurrentUser",
+JSON.stringify(user)
+);
+
+closeModal("signupModal");
+
+updateAuth();
+
+updateProfile();
+
+showToast("Account created successfully!");
+
+}
+
+
+function switchSignup(){
+
+closeModal("loginModal");
+
+document.getElementById("signupModal")
+.style.display="flex";
+
+}
+
+
+function logout(){
+
+currentUser=null;
+
+localStorage.removeItem("qcCurrentUser");
+
+updateAuth();
+
+updateProfile();
+
+showPage("home");
+
+showToast("Logged out.");
+
+}
+
+
+function updateAuth(){
+
+let btn=
+document.getElementById("authBtn");
+
+if(currentUser){
+
+btn.innerText="Logout";
+
+btn.onclick=logout;
+
+}else{
+
+btn.innerText="Login";
+
+btn.onclick=openLogin;
+
+}
+
+}
+
+
+/* =========================
+   PROFILE
+========================= */
+
+function updateProfile(){
+
+if(!currentUser){
+
+document.getElementById("profileName")
+.innerText="Guest";
+
+document.getElementById("profileEmail")
+.innerText="Please login.";
+
+return;
+
+}
+
+document.getElementById("profileName")
+.innerText=currentUser.name;
+
+document.getElementById("profileEmail")
+.innerText=currentUser.email;
+
+}
+
+
+/* =========================
+   ADDRESS
+========================= */
+
+function changeAddress(){
+
+let address=prompt(
+"Enter your delivery location:"
+);
+
+if(address){
+
+document.getElementById("locationText")
+.innerText=address;
+
+localStorage.setItem(
+"qcAddress",
+address
+);
+
+}
+
+}
+
+
+/* =========================
+   NAVIGATION
+========================= */
+
+function showPage(page){
+
+let pages=[
+"homePage",
+"ordersPage",
+"wishlistPage",
+"profilePage",
+"adminPage"
+];
+
+pages.forEach(id=>
+document.getElementById(id)
+.classList.add("hidden")
+);
+
+if(page==="home")
+document.getElementById("homePage")
+.classList.remove("hidden");
+
+if(page==="orders"){
+
+document.getElementById("ordersPage")
+.classList.remove("hidden");
+
+renderOrders();
+
+}
+
+if(page==="wishlist"){
+
+document.getElementById("wishlistPage")
+.classList.remove("hidden");
+
+renderWishlist();
+
+}
+
+if(page==="profile")
+document.getElementById("profilePage")
+.classList.remove("hidden");
+
+if(page==="admin"){
+
+document.getElementById("adminPage")
+.classList.remove("hidden");
+
+updateAdmin();
+
+}
+
+}
+
+
+/* =========================
+   ADMIN
+========================= */
+
+function updateAdmin(){
+
+document.getElementById("statProducts")
+.innerText=products.length;
+
+document.getElementById("statUsers")
+.innerText=users.length;
+
+document.getElementById("statOrders")
+.innerText=orders.length;
+
+let revenue=orders
+.filter(o=>o.status!=="Cancelled")
+.reduce(
+(sum,o)=>sum+o.total,
+0
+);
+
+document.getElementById("statRevenue")
+.innerText=
+revenue.toLocaleString();
+
+let container=
+document.getElementById("adminOrders");
+
+container.innerHTML="";
+
+orders.slice(-5).reverse()
+.forEach(order=>{
+
+container.innerHTML+=`
+
+<div class="card">
+
+<h3>${order.id}</h3>
+
+<p>User: ${order.user}</p>
+
+<p>₹${order.total}</p>
+
+<p>${order.status}</p>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+/* =========================
+   DARK MODE
+========================= */
+
+function toggleDark(){
+
+document.body.classList.toggle("dark");
+
+localStorage.setItem(
+"qcDark",
+document.body.classList.contains("dark")
+);
+
+}
+
+
+/* =========================
+   MODALS
+========================= */
+
+function closeModal(id){
+
+document.getElementById(id)
+.style.display="none";
+
+}
+
+
+/* =========================
+   TOAST
+========================= */
+
+function showToast(message){
+
+let toast=
+document.getElementById("toast");
+
+toast.innerText=message;
+
+toast.style.display="block";
+
+setTimeout(()=>{
+toast.style.display="none";
+},2500);
+
+}
+
+
+/* =========================
+   LOAD SAVED DATA
+========================= */
+
+let savedAddress=
+localStorage.getItem("qcAddress");
+
+if(savedAddress){
+
+document.getElementById("locationText")
+.innerText=savedAddress;
+
+}
+
+if(localStorage.getItem("qcDark")==="true"){
+
+document.body.classList.add("dark");
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+renderProducts(products);
+
+renderWishlist();
+
+updateCartCount();
+
+updateAuth();
+
+updateProfile();
+
+updateAdmin();
+
+</script>
+
+</body>
+</html>
